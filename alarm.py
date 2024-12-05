@@ -114,8 +114,8 @@ try:
         print(f"Brightness: {brightness}")
 
         # Check if within 7:30 AM to 9:00 AM for light sound and if dark
-        # if time(7, 30) <= current_time <= time(9, 0):
-        if True:
+        if time(7, 30) <= current_time <= time(9, 0):
+        # if True:
             if brightness < 70:  # Adjust threshold as needed
                 print("It's dark! Playing lights sound.")
                 if not pygame.mixer.get_busy():
