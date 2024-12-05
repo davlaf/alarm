@@ -1,7 +1,6 @@
 import cv2
 import numpy as np
 import pygame
-from time import sleep
 from datetime import time, datetime
 import pyudev
 
@@ -46,14 +45,6 @@ def select_camera(name: str) -> int:
                 return index
     raise ValueError(f"No working camera found matching name: {name}")
 
-def calculate_brightness(frame) -> float:
-    """
-    Calculate the average brightness of the given frame.
-    Returns a value between 0 (dark) and 255 (bright).
-    """
-    gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    return np.mean(gray_frame)
-
 # Find the camera
 try:
     camera_index = select_camera("HD Pro Webcam C920")
@@ -97,44 +88,18 @@ def isPersonPresent() -> bool:
 
 # Initialize pygame mixer
 pygame.mixer.init(buffer=8192)
-alarm_sound = pygame.mixer.Sound('/home/dav/alarm/iphone_alarm.wav')
-light_sound = pygame.mixer.Sound('/home/dav/alarm/ok_google_turn_on_bedroom_lights.wav')
-
+sound = pygame.mixer.Sound('/home/dav/alarm/iphone_alarm.wav')
+        
 try:
     while True:
-        current_time = datetime.now().time()
-
-        # Grab frame from camera
-        ret, frame = cap.read()
-        if not ret:
-            print("Failed to grab frame")
-            continue
-
-        brightness = calculate_brightness(frame)
-        print(f"Brightness: {brightness}")
-
-        # Check if within 7:30 AM to 9:00 AM for light sound and if dark
-        # if time(7, 30) <= current_time <= time(9, 0):
-        if True:
-            if brightness < 70:  # Adjust threshold as needed
-                print("It's dark! Playing lights sound.")
-                if not pygame.mixer.get_busy():
-                    light_sound.play()
-                sleep(3)
-            else:
-                print("Bright enough, stopping lights sound.")
-                light_sound.stop()
-                sleep(3)
-
-        # Check if within 7:30 AM to 10:30 PM for alarm
-        if time(7, 30) <= current_time <= time(22, 30):
+        if time(7, 30) <= datetime.now().time() <= time(22, 30):
             if isPersonPresent():
                 print("Person!")
                 if not pygame.mixer.get_busy():
-                    alarm_sound.play()
+                    sound.play()
             else:
                 print("Not person!")
-                alarm_sound.stop()
+                sound.stop()
 
 except KeyboardInterrupt:
     print("Stopped by user")
